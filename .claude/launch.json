@@ -1,0 +1,14 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "keyflow",
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": [
+        "/c",
+        "scripts\\dev.cmd"
+      ],
+      "port": 3123
+    }
+  ]
+}
