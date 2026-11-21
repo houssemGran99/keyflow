@@ -49,8 +49,9 @@ export default function ProfilePage() {
   const bindings = useMemo(() => {
     const byOffset = new Map<number, string[]>();
     for (const b of settings.keymap) byOffset.set(b.offset, [...(byOffset.get(b.offset) ?? []), b.code]);
+    const minOff = Math.min(0, ...settings.keymap.map((b) => b.offset));
     const maxOff = Math.max(24, ...settings.keymap.map((b) => b.offset));
-    return Array.from({ length: maxOff + 1 }, (_, off) => ({ off, codes: byOffset.get(off) ?? [] }));
+    return Array.from({ length: maxOff - minOff + 1 }, (_, i) => ({ off: minOff + i, codes: byOffset.get(minOff + i) ?? [] }));
   }, [settings.keymap]);
 
   const rebind = (offset: number) => {

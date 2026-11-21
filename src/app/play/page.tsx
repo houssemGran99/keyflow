@@ -162,7 +162,7 @@ export default function FreePlayPage() {
       <div className="card p-3 hidden sm:flex flex-wrap items-center gap-x-6 gap-y-2">
         <div className="text-xs text-muted max-w-[14rem]">
           <div className="font-semibold text-fg text-sm">Your keys</div>
-          Blue letters play white keys, purple letters play black keys. The same letters are shown on the piano below.
+          Blue letters play white keys, purple letters play black keys. The bottom row of letters is the octave below. The same letters are shown on the piano below.
         </div>
         <KeymapGuide />
         <div className="text-xs text-muted flex flex-col gap-1">

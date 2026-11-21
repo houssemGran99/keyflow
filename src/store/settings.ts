@@ -47,10 +47,11 @@ export const useSettings = create<SettingsState>()(
         const s = get();
         const kb = Math.max(0, Math.min(6, s.keyboardOctave + delta));
         // Keep the mapped range visible on the on-screen keyboard.
-        const maxOffset = Math.max(...s.keymap.map((b) => b.offset));
-        const mappedTopOct = kb + Math.floor(maxOffset / 12);
+        const offsets = s.keymap.map((b) => b.offset);
+        const mappedTopOct = kb + Math.floor(Math.max(...offsets) / 12);
+        const mappedLowOct = kb + Math.floor(Math.min(...offsets) / 12);
         let start = s.startOctave;
-        if (kb < start) start = kb;
+        if (mappedLowOct < start) start = mappedLowOct;
         if (mappedTopOct > start + s.octaves - 1) start = Math.max(0, mappedTopOct - s.octaves + 1);
         start = Math.min(start, 8 - s.octaves);
         set({ keyboardOctave: kb, startOctave: Math.max(0, start) });
@@ -63,13 +64,17 @@ export const useSettings = create<SettingsState>()(
     }),
     {
       name: "keyflow-settings",
-      version: 2,
+      version: 3,
       skipHydration: true,
-      // v1 defaulted to the two-row tracker layout; move untouched users to the easier home-row layout.
       migrate: (state, version) => {
         const s = state as Partial<SettingsState>;
+        // v1 defaulted to the two-row tracker layout; move untouched users to the easier home-row layout.
         if (version < 2 && s.keymapPreset === "tracker") {
           return { ...s, keymap: KEYMAP_PRESETS.homerow.bindings, keymapPreset: "homerow", keyboardOctave: 4 };
+        }
+        // v3 added the bottom row (lower octave) to the home-row preset.
+        if (version < 3 && s.keymapPreset === "homerow") {
+          return { ...s, keymap: KEYMAP_PRESETS.homerow.bindings };
         }
         return s;
       },
