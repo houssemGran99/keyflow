@@ -32,7 +32,7 @@ export const useSettings = create<SettingsState>()(
       volume: 0.8,
       reverb: 0.22,
       accompanimentVolume: 0.7,
-      showNoteNames: true,
+      showNoteNames: false,
       showKeyLabels: true,
       octaves: 3,
       startOctave: 3,
@@ -64,19 +64,19 @@ export const useSettings = create<SettingsState>()(
     }),
     {
       name: "keyflow-settings",
-      version: 3,
+      version: 4,
       skipHydration: true,
       migrate: (state, version) => {
-        const s = state as Partial<SettingsState>;
+        let next = state as Partial<SettingsState>;
         // v1 defaulted to the two-row tracker layout; move untouched users to the easier home-row layout.
-        if (version < 2 && s.keymapPreset === "tracker") {
-          return { ...s, keymap: KEYMAP_PRESETS.homerow.bindings, keymapPreset: "homerow", keyboardOctave: 4 };
+        if (version < 2 && next.keymapPreset === "tracker") {
+          next = { ...next, keymap: KEYMAP_PRESETS.homerow.bindings, keymapPreset: "homerow", keyboardOctave: 4 };
         }
         // v3 added the bottom row (lower octave) to the home-row preset.
-        if (version < 3 && s.keymapPreset === "homerow") {
-          return { ...s, keymap: KEYMAP_PRESETS.homerow.bindings };
-        }
-        return s;
+        if (version < 3 && next.keymapPreset === "homerow") next = { ...next, keymap: KEYMAP_PRESETS.homerow.bindings };
+        // v4: show only the computer-key letters by default; note names were confusing next to them.
+        if (version < 4) next = { ...next, showNoteNames: false };
+        return next;
       },
     }
   )

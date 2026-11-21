@@ -1,8 +1,8 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { codeLabel, isBlack, noteName } from "@/lib/music";
 import { useSettings } from "@/store/settings";
-import { getLayoutMap } from "./PianoKeyboard";
+import { useLayoutMap } from "./useKeyLabels";
 
 /**
  * Cheat-sheet for the computer keyboard: black-key letters on the top row,
@@ -11,10 +11,7 @@ import { getLayoutMap } from "./PianoKeyboard";
 export function KeymapGuide({ className = "" }: { className?: string }) {
   const keymap = useSettings((s) => s.keymap);
   const octave = useSettings((s) => s.keyboardOctave);
-  const [layoutMap, setLayoutMap] = useState<Map<string, string> | null>(null);
-  useEffect(() => {
-    getLayoutMap().then(setLayoutMap);
-  }, []);
+  const layoutMap = useLayoutMap();
 
   const keys = useMemo(() => {
     const seen = new Set<number>();
@@ -33,7 +30,7 @@ export function KeymapGuide({ className = "" }: { className?: string }) {
     <div className={`hidden sm:block ${className}`} aria-label="Computer keyboard guide">
       <div className="relative inline-flex flex-col gap-1 pt-0.5">
         {/* Black keys sit between the white keys they belong to */}
-        <div className="relative h-9">
+        <div className="relative h-6">
           {keys
             .filter((k) => k.black)
             .map((k) => {
@@ -49,7 +46,6 @@ export function KeymapGuide({ className = "" }: { className?: string }) {
                   <span className="flex h-6 w-8 items-center justify-center rounded-md bg-[var(--accent)] font-mono text-[13px] font-bold text-white shadow-[inset_0_-2px_0_rgba(0,0,0,0.25)]">
                     {k.label}
                   </span>
-                  <span className="text-[9px] text-muted mt-0.5">{noteName(k.midi, false)}</span>
                 </div>
               );
             })}
@@ -59,9 +55,6 @@ export function KeymapGuide({ className = "" }: { className?: string }) {
             <div key={k.midi} className="flex w-8 flex-col items-center" title={`${k.label} plays ${noteName(k.midi)}`}>
               <span className="flex h-6 w-8 items-center justify-center rounded-md bg-[var(--accent-2)] font-mono text-[13px] font-bold text-white shadow-[inset_0_-2px_0_rgba(0,0,0,0.25)]">
                 {k.label}
-              </span>
-              <span className={`text-[9px] mt-0.5 ${k.midi % 12 === 0 ? "text-fg font-semibold" : "text-muted"}`}>
-                {k.midi % 12 === 0 ? noteName(k.midi) : noteName(k.midi, false)}
               </span>
             </div>
           ))}
